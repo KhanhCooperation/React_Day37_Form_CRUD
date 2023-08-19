@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   productList: [],
-  productEdit: [],
+  productEdit: undefined,
 };
 
 const btFormSlice = createSlice({
@@ -11,12 +11,12 @@ const btFormSlice = createSlice({
   reducers: {
     addProduct: (state, action) => {
       //action.payload: id cua Product muon add
-      console.log("payload: ", action.payload);
+      // console.log("payload: ", action.payload);
       state.productList.push(action.payload);
     },
     removeProduct: (state, action) => {
       //action.payload = id của product muốn xóa
-      console.log("act PAY: ", action.payload);
+      // console.log("act PAY: ", action.payload);
 
       // function filterProductById(prd, prdtoFilter) {
       //   console.log("prd.ID: ", prd.idSV);
@@ -32,7 +32,7 @@ const btFormSlice = createSlice({
 
       // let newArr = [];
       state.productList = state.productList.filter(
-        (prd) => prd.idSV != action.payload
+        (prd) => prd.idSV !== action.payload
       );
       // console.log("List mới: ", newArr);
       //? Sao thay list thành Array nó bị lỏ?
@@ -41,7 +41,7 @@ const btFormSlice = createSlice({
       console.log(action.payload);
 
       state.productEdit = state.productList.filter(
-        (prd) => prd.idSV == action.payload
+        (prd) => prd.idSV === action.payload
       );
     },
   },

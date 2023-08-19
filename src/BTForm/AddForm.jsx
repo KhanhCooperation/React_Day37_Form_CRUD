@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { btFormActions } from "../store/BTForm/slice";
-import { checkDuplicate, validInput, validLength, validReg } from "../validate/Validate";
+import {
+  checkDuplicate,
+  validInput,
+  validLength,
+  validReg,
+} from "../validate/Validate";
+import { toast } from 'react-toastify';
 
 const AddForm = () => {
   const [formData, setFormData] = useState();
@@ -11,7 +17,6 @@ const AddForm = () => {
   // console.log("ProList: ", productList);
   //error:
   const [formError, setFormError] = useState();
-
 
   // render thông báo lần đầu ========================
   useEffect(() => {
@@ -40,61 +45,33 @@ const AddForm = () => {
   //=========
   const handleData = () => (ev) => {
     const { name, title, max, minLength, value, validity } = ev.target;
-    // console.log("valid: ", validity);
-    //validate
     let flag;
     let mess;
-    flag= validInput(minLength, value, mess, title) & !checkDuplicate(productList, value, "idSV" ) & validReg(validity, name, mess) & validLength(value, max, minLength, name, mess)
+    if (minLength !== -1 && !value?.length) {
+      mess = `Vui lòng nhập ${title}`;
+    } else if (value.length < minLength) {
+      mess = `Vui lòng nhập tối thiểu ${minLength}`;
+    } else if (validity.patternMismatch && name === "idSV") {
+      mess = `${name} phải có dạng: SVxxx (x là ký số) `;
+    } else if (validity.patternMismatch && name === "email") {
+      mess = `${name} phải có dạng: abc@gmail.com`;
+    } else if (validity.patternMismatch && name === "tenSV") {
+      mess = `${name} mà có số hay vậy?`;
+    } else if (validity.patternMismatch && name === "sdt") {
+      mess = `${name} mà có chữ ?:)))`;
+    }
 
-console.log("mess: ", mess);
-    // if (minLength !== -1 && !value.length ) {
-    //   // console.log("Lỗi ko nhập");
-    //   mess = `Vui lòng nhập ${title}`;
-    //   flag = false;
-    // } else if (name === "idSV" && 
-    // productList.map( (e) => {
-    //   if (value === e.idSV){
-    //     return true;
-    //   }else{
-    //     return false;
-    //   }
-    // })
-    // ){
-    //   mess=`${name} đã tồn tại, Vui lòng nhập id khác`;
-    //   flag = false
-    // } else if (validity.patternMismatch) {
-    //   // console.log("Lỗi regex");
-    //   if (name === "idSV") {
-    //     mess = `${name} phải có dạng: SVxxx (x là ký số) `;
-    //     flag = false;
-    //   } else if (name === "email") {
-    //     mess = `${name} phải có dạng: abc@gmail.com`;
-    //     flag = false;
-    //   } else if (name === "tenSV") {
-    //     mess = `${name} mà có số hay vậy?`;
-    //     flag = false;
-    //   } else if ((name === "sdt")) {
-    //     mess = `${name} mà có chữ ?:)))`;
-    //     flag = false;
-    //   }
-    
-    // } else if (( value.length > max || value.length < minLength ) && name === "idSV") {
-    //   // console.log("lỗi độ dài");
-    //   mess = `Ký tự phải có dộ dài lớn hơn ${minLength} và bé hơn ${max}`;
-    //   flag = false;
-    // }else{
-    //   flag=true;
-    // }
-
-    setFormError({
-      ...formError,
-      [name]: mess,
-    });
     setFormData({
       ...formData,
-      [ev.target.name]: ev.target.value,
-    });
-    return flag;
+      [name] : ev.target.value
+    })
+
+    console.log("formErr: ", formError);
+    setFormError({
+      ...formError,
+      [name] : mess
+    })
+
   };
 
   useEffect(() => {
@@ -110,11 +87,38 @@ console.log("mess: ", mess);
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        let flag = handleData();
-        if (flag && formData.length !== 0) {
+
+          let flag = false;
+          for (let key in formError) {
+            if (formError[key]) {
+              flag = true;
+              break;
+            }
+          }
+          console.log("FormData: ", formData.idSV);
+          console.log("Product List: ", productList);
+          console.log("FLAG: ", flag);
+          // eslint-disable-next-line array-callback-return
+          productList.map( (e) => {
+            if(e.idSV === formData.idSV){
+              console.log("ID TRÙNG");
+              flag=true
+              toast.error("ID đã tồn tại, vui lòng nhập ID Khác")
+              // eslint-disable-next-line array-callback-return
+              return
+            }
+          })
+          if(flag === true ){
+            return
+          }
+
           dispatch(btFormActions.addProduct(formData));
-          console.log("SUBMIT");
-        }
+
+        //   if (flag && formData?.length !== 0) {
+        //     dispatch(btFormActions.addProduct(formData));
+        //     console.log("SUBMIT");
+        //   }
+        // });
       }}
     >
       {/* //*Title */}
@@ -136,8 +140,8 @@ console.log("mess: ", mess);
             title="mã sinh viên"
             type="text"
             placeholder="Jane"
-            minLength={1}
-            max={5}
+            minLength={2}
+            max={6}
             pattern="^SV\d{0,3}$"
             onChange={handleData()}
           />
@@ -156,7 +160,7 @@ console.log("mess: ", mess);
             title="tên SV"
             type="text"
             placeholder="Jane"
-            minLength={1}
+            minLength={3}
             pattern="^[a-zA-Z_ÀÁÂÃÈÉÊẾÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\\s]+$"
             onChange={handleData()}
           />
@@ -203,9 +207,11 @@ console.log("mess: ", mess);
         </div>
       </div>
       {/* //*Button  */}
-      <button className="mx-3 my-1 bg-green-500 p-2 rounded-xl flex justify-items-start">
-        Thêm Sinh Viên
-      </button>
+      <div className="flex">
+        {!(productEdit) && <button className="mx-3 my-1 bg-green-500 p-2 rounded-xl flex justify-items-start">Thêm Sinh Viên</button>}
+      {(productEdit) && <button className="mx-3 my-1 bg-blue-500 p-2 rounded-xl flex justify-items-start">Cập Nhập</button>}
+      
+      </div>
     </form>
   );
 };
