@@ -75,6 +75,7 @@ const AddForm = () => {
   };
 
   useEffect(() => {
+    if(!productEdit) return
     if (productEdit) {
       setFormData(productEdit);
       return;
@@ -137,6 +138,7 @@ const AddForm = () => {
             className="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             name="idSV"
             value={formData ? formData[0]?.idSV : formData?.idSV}
+            // value={productEdit ? productEdit[0]?.idSV: productEdit?.idSV} 
             title="mã sinh viên"
             type="text"
             placeholder="Jane"
@@ -157,6 +159,7 @@ const AddForm = () => {
             id="grid-first-name"
             name="tenSV"
             value={formData ? formData[0]?.tenSV : formData?.tenSV}
+            // value={productEdit ? productEdit[0]?.tenSV : productEdit?.tenSV}
             title="tên SV"
             type="text"
             placeholder="Jane"
@@ -178,7 +181,8 @@ const AddForm = () => {
             className="appearance-none block w-full bg-gray-200 text-gray-700  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             name="sdt"
             value={formData ? formData[0]?.sdt : formData?.sdt}
-            // value={formData[0]?.idSV}
+            // value={productEdit ? productEdit[0]?.sdt: productEdit?.sdt  }
+           // value={formData[0]?.idSV}
             type="text"
             title="Số điện thoại"
             placeholder="Jane"
@@ -196,6 +200,7 @@ const AddForm = () => {
             className="appearance-none block w-full bg-gray-200 text-gray-700  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             name="email"
             value={formData ? formData[0]?.email : formData?.email}
+            // value={productEdit ? productEdit[0]?.email : productEdit?.email}
             title="Email"
             type="text"
             placeholder="Jane"
