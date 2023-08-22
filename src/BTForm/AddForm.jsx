@@ -11,7 +11,6 @@ import { toast } from 'react-toastify';
 
 const AddForm = () => {
   const [formData, setFormData] = useState();
-  console.log("formData: ", formData);
   const dispatch = useDispatch();
   const { productList, productEdit } = useSelector((state) => state.btForm);
   // console.log("ProList: ", productList);
@@ -44,8 +43,7 @@ const AddForm = () => {
 
   //=========
   const handleData = () => (ev) => {
-    const { name, title, max, minLength, value, validity } = ev.target;
-    let flag;
+    const { name, title, minLength, value, validity } = ev.target;
     let mess;
     if (minLength !== -1 && !value?.length) {
       mess = `Vui lòng nhập ${title}`;
@@ -66,7 +64,6 @@ const AddForm = () => {
       [name] : ev.target.value
     })
 
-    console.log("formErr: ", formError);
     setFormError({
       ...formError,
       [name] : mess
@@ -75,13 +72,14 @@ const AddForm = () => {
   };
 
   useEffect(() => {
-    if(!productEdit) return
+    if(!productEdit) {
+      return
+    }
     if (productEdit) {
-      setFormData(productEdit);
+      setFormData(productEdit[0]);
       return;
     }
     //*Dùng để bắt thay đổi, nó render lại sự thay đổi
-    console.log("formData trong UE: ", formData);
   }, [productEdit]);
 
   return (
@@ -96,13 +94,10 @@ const AddForm = () => {
               break;
             }
           }
-          console.log("FormData: ", formData.idSV);
-          console.log("Product List: ", productList);
-          console.log("FLAG: ", flag);
+
           // eslint-disable-next-line array-callback-return
           productList.map( (e) => {
-            if(e.idSV === formData.idSV){
-              console.log("ID TRÙNG");
+            if(e.idSV === formData.idSV && !productEdit){
               flag=true
               toast.error("ID đã tồn tại, vui lòng nhập ID Khác")
               // eslint-disable-next-line array-callback-return
@@ -113,7 +108,12 @@ const AddForm = () => {
             return
           }
 
-          dispatch(btFormActions.addProduct(formData));
+          if(productEdit){
+            dispatch(btFormActions.updateProduct(formData))
+          }else{
+            dispatch(btFormActions.addProduct(formData));
+          }
+
 
         //   if (flag && formData?.length !== 0) {
         //     dispatch(btFormActions.addProduct(formData));
@@ -137,7 +137,8 @@ const AddForm = () => {
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             name="idSV"
-            value={formData ? formData[0]?.idSV : formData?.idSV}
+            value={formData ? formData?.idSV : formData?.idSV}
+            disabled = { (productEdit)? true: false }
             // value={productEdit ? productEdit[0]?.idSV: productEdit?.idSV} 
             title="mã sinh viên"
             type="text"
@@ -158,7 +159,7 @@ const AddForm = () => {
             className="appearance-none block w-full bg-gray-200 text-gray-700  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             id="grid-first-name"
             name="tenSV"
-            value={formData ? formData[0]?.tenSV : formData?.tenSV}
+            value={formData ? formData?.tenSV : formData?.tenSV}
             // value={productEdit ? productEdit[0]?.tenSV : productEdit?.tenSV}
             title="tên SV"
             type="text"
@@ -180,7 +181,7 @@ const AddForm = () => {
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             name="sdt"
-            value={formData ? formData[0]?.sdt : formData?.sdt}
+            value={formData ? formData?.sdt : formData?.sdt}
             // value={productEdit ? productEdit[0]?.sdt: productEdit?.sdt  }
            // value={formData[0]?.idSV}
             type="text"
@@ -199,7 +200,7 @@ const AddForm = () => {
           <input
             className="appearance-none block w-full bg-gray-200 text-gray-700  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
             name="email"
-            value={formData ? formData[0]?.email : formData?.email}
+            value={formData ? formData?.email : formData?.email}
             // value={productEdit ? productEdit[0]?.email : productEdit?.email}
             title="Email"
             type="text"

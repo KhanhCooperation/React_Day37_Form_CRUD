@@ -12,16 +12,6 @@ const btFormSlice = createSlice({
     addProduct: (state, action) => {
       //action.payload: id cua Product muon add
       // console.log("payload: ", action.payload);
-      state.productList.map( (prd) => {
-        if(prd.idSV === action.payload){
-          let arr= state.productList.filter(
-            (prd1) => prd1.idSV !== action.payload
-          );
-          state.productList=[...arr]
-          state.productList.push(action.payload);
-          return;
-        }
-      })
       state.productList.push(action.payload);
     },
     removeProduct: (state, action) => {
@@ -49,15 +39,19 @@ const btFormSlice = createSlice({
     },
     editProduct: (state, action) => {
       console.log(action.payload);
-      //!Mau chot
+      //*Lay obj bo vao productEdit
       state.productEdit = state.productList.filter(
         (prd) => prd.idSV === action.payload
       );
-
-      
-      
+    },
+    updateProduct: (state, action) => {
+      let newArr= state.productList.filter( (prd) => prd.idSV !== action.payload.idSV )
+      state.productList=[...newArr];
+      state.productList.push(action.payload)
+      state.productEdit = undefined;
+    }
     },
   },
-});
+);
 
 export const { actions: btFormActions, reducer: btFormReducer } = btFormSlice;
